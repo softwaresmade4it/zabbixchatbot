@@ -1,0 +1,4 @@
+requests==2.20.0
+python_telegram_bot==13.11
+pyzabbix==1.2.1
+argparse==1.4.0
