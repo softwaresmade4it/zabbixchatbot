@@ -239,7 +239,7 @@ def login():
         varcookie = None
 
 def main():
-    updater = Updater(token='6212620631:AAFAAKukdnoVr-dr_mnjWUyJa7qrwvBdl6c')
+    updater = Updater(token='BotToken')
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("help", help))
     dispatcher.add_handler(CommandHandler("graficos", help))

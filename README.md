@@ -11,7 +11,7 @@ Zabbix Chat Bot, é um script em python que é utilizado como um intermediário 
 |varPassword | zabbix | Senha do user que tem acesso a API do Zabbix |
 |varZabbixServer | http://192.168.162.202/zabbix/ | IP de Acesso ao FrontEnd Do zabbix|
 | url_template | http://192.168.162.202/zabbix/chart2.php?graphid={graphid}&from=now-24h&to=now&height=201&width=1679&profileIdx=web.charts.filter&_=vx2jnxh4 | IP ou dominio de Acesso ao FrontEnd Do zabbix |
-
+| token | BotToken | Token do Bot do Telegram  |
 
 ## DockerFile
 To use a Zabbix Bot in container use a Dockerfile. Let's start by build an image :
