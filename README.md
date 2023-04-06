@@ -27,3 +27,52 @@ Agora basta iniciar o nosso container
 ```sh
 docker container run -d zabbix-chat-bot
 ```
+
+## Funcionamento
+
+As funções:
+```python
+def help(update, context):
+def menuLINK(update, context):
+def menuOLT(update, context):
+```
+
+Possui qual o 
+```python 
+text= 
+```
+que será enviado para o usuário sempre que ele digitar:
+```python
+dispatcher.add_handler(CommandHandler("help", help))
+dispatcher.add_handler(CommandHandler("graficos", help))
+dispatcher.add_handler(CommandHandler("links", menuLINK))
+dispatcher.add_handler(CommandHandler("olts", menuOLT))
+```
+
+Então caso quiser alterar o conteúdo, ou a palavra que vai chamar a função, basta alterar.
+
+### Adicionado Host/Grafico
+
+Para adicionar o gráfico de um hosts manualmente, temos que fazer o seguinte:
+
+ - Garantir que a função que chama o gráfico, contenha o texto que você quer utilizar para exibir o gráfico:
+```python
+def menuLINK(update, context):
+chat_id = update.message.chat_id
+context.bot.sendMessage(chat_id=chat_id, text="LINKS IP's Robson GO:\n"
+"/linkCidade1 - Ver informações do Link de CIDADE 1\n"
+"/linkCidade2 - Ver informações do Link CIDADE 2\n"
+)
+```
+
+ No caso acima o /linkCidadade1 e /linkCidade2 são os menus que iram chamar alguma função.
+ ```python
+dispatcher.add_handler(CommandHandler("linkCidade1", lambda update, context: enviar_grafico(update, context, get_graphid('CCR 1016','Interface vlan195(Telefonia Made4it e Persis): Network traffic'))))
+dispatcher.add_handler(CommandHandler("linkCidade2", lambda update, context: enviar_grafico(update, context, get_graphid('CCR 1016', 'Interface vlan4000(GERENCIA-Meth-OLT-MADE4OLT): Network traffic'))))
+ ```
+
+Agora basta adicionar qual o **HOST** e o **GRÁFICO** que deseja:
+No meu caso:
+
+**Host:** CCR 1016
+**Gráfico:** Interface vlan4000(GERENCIA-Meth-OLT-MADE4OLT): Network traffic
