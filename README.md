@@ -14,7 +14,62 @@ Zabbix Chat Bot, é um script em python que é utilizado como um intermediário 
 | varPassword | zabbix | Senha do user que tem acesso a API do Zabbix |
 | varUsername | Admin | Nome do user que tem acesso a API do Zabbix |
 
+## SystemD
+
+Para utilizar o script como um serviço no systemd:
+
+- Mova o arquivo zabbix-chat-bot.py para  /usr/lib/zabbix/alertscripts/
+``` sh
+mv  zabbix-chat-bot.py /usr/lib/zabbix/alertscripts/
+```
+- Instalar dependências:
+
+Debian:
+```sh 
+# apt install python3-pip python-urllib3
+# pip install -r requeriments.txt 
+```
+-  Edite o script e alimente as variáveis
+
+- Crie um serviço no systemd para deixar o script em execução:
+```sh
+vim /etc/systemd/system/zabbix-chat-bot.service 
+```
+
+Conteudo:
+```sh
+[Unit]
+Description=Python Script Zabbix Chat Bot
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/lib/zabbix/alertscripts/zabbix-chat-bot.py
+Restart=on-abort
+[Install]
+WantedBy=multi-user.target
+```
+
+- De a permissão de execução no service
+```sh
+# chmod a+x /etc/systemd/system/zabbix-chat-bot.service
+```
+
+- Ative o script para executar com o sistema e inicie ele
+```sh
+# systemctl daemon-reload
+# systemctl enable --now zabbix-chat-bot.service
+```
+- Para validar se executou corretamente, valide o status do serviço
+```sh
+# systemctl status zabbix-chat-bot
+```
+
+
 ## DockerFile
+
+Para instalar o Docker
+```sh
+curl -fsSL https://get.docker.com/ | bash
+```
 
 Para utilizar o Zabbix Chat bot em um container usando o DockerFile, primeiro temosq ue buildar a imagem:
 PS: Antes de executar os comandos tenha certeza que os arquivos desse repositório estão no diretório atual
@@ -76,3 +131,51 @@ No meu caso:
 
 **Host:** CCR 1016
 **Gráfico:** Interface vlan4000(GERENCIA-Meth-OLT-MADE4OLT): Network traffic
+
+
+## Script
+
+### Requisitos
+
+A nova função de script funciona da seguinte forma:
+
+Enviamos o nome do Host e o Nome do Script, via API do zabbix valida se existe o host e script e então executa o script para o host especifico.
+
+Para exemplo criei um script que realiza o reboot do zabbix server (via agent) e reboota um mikrotik (via script ssh).
+
+
+Primeiro temos que configurar o user do zabbix_server para poder dar comandos em nosso servidor.
+
+- Instale o pacote sudo
+
+Debian:
+``` sh
+# apt install sudo
+```
+- Edite o arquivo: /etc/sudoers e permita o zabbix executar comandos sem senha
+
+```sh
+# vim /etc/sudoers 
+```
+Adicione, logo abaixo de **root	ALL=(ALL:ALL) ALL**
+```sh
+zabbix ALL=(ALL) NOPASSWD:ALL
+```
+- Vamos dar um shell para o user Zabbix e criar a home dele
+```sh
+# sudo chsh -s /bin/bash zabbix
+# mkdir /var/lib/zabbix/
+# chown -R zabbix. /var/lib/zabbix/
+```
+
+Para teste você pode instalar o pacote nmap em seu servidor, e testar a execução do script que já existe no Zabbix, que é o: **Detect operating system**
+
+Pois ele utiliza o sudo e o shell para executar o comando e dar o retorno.
+
+
+### Configuração
+
+Agora precisamos criar nossos scripts no FrontEnd do Zabbix, na versão 6.4 fica em:
+Alerts > Script
+
+
