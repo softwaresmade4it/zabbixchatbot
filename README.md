@@ -178,4 +178,32 @@ Pois ele utiliza o sudo e o shell para executar o comando e dar o retorno.
 Agora precisamos criar nossos scripts no FrontEnd do Zabbix, na versão 6.4 fica em:
 Alerts > Script
 
+![image](https://user-images.githubusercontent.com/17807481/231864046-843230ab-d90c-4278-ac80-16223b386d86.png)
+
+
+- Crie os seguintes Scripts:
+![image](https://user-images.githubusercontent.com/17807481/231864118-35938a92-16e2-4a34-b6c1-394de09f33ab.png)
+![image](https://user-images.githubusercontent.com/17807481/231864212-db2ba703-ea71-46c6-9ff2-99a60fcd3462.png)
+
+Conteudo:
+```sh
+sudo /usr/bin/python3 /usr/lib/zabbix/alertscripts/reboot_device.py {$USER} {$PASS} {HOST.CONN} {$TYPE}
+```
+
+- Lembresse de mover o script que está nesse repositório para /usr/lib/zabbix/alertscripts/reboot_device.py
+
+#### Variáveis
+- {$USER} - Usuário SSH
+- {$PASS} - Senha SSH
+- {HOST.CONN} - IP do Host, variavel padrão do zabbix
+- {$TYPE} - Tipo do Host, com base no tipo do host pode mudar o comando, por enquanto suporte somente a mikrotik
+
+
+- Essas variáveis seram enviadas via MACRO do HOST
+
+![image](https://user-images.githubusercontent.com/17807481/231864755-adf5c468-b16d-4b9e-8533-08a976af0a85.png)
+
+- Apos criar os scripts, vincular as macros no host, vá ao telegram e faça os testes
+Exemplo:
+![image](https://user-images.githubusercontent.com/17807481/231865005-749f34b3-7180-41e5-ac77-f9ff85e34f6e.png)
 
