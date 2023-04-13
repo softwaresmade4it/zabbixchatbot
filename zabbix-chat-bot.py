@@ -18,6 +18,54 @@ varZabbixLanguage = "US"
 zapi = ZabbixAPI(varZabbixServer)
 zapi.login(varUsername, varPassword)
 
+
+def execute_script_on_host(chat_id, host_name, script_name):
+    # Use a API do Zabbix para obter o ID do host com base no nome
+    host = zapi.host.get(filter={'name': host_name})
+    if not host:
+        return f"O host {host_name} não foi encontrado no Zabbix."
+
+    host_id = host[0]['hostid']
+
+    # Use a API do Zabbix para obter o ID do script com base no nome
+    script = zapi.script.get(filter={'name': script_name})
+    if not script:
+        return f"O script {script_name} não foi encontrado no Zabbix."
+
+    script_id = script[0]['scriptid']
+
+    # Use a API do Zabbix para executar o script no host especificado usando o ID do host e do script
+    try:
+        result = zapi.script.execute(hostid=host_id, scriptid=script_id)
+    except Exception as e:
+        return f"Ocorreu um erro ao executar o script {script_name} no host {host_name}: {e}"
+
+    # Retorne uma mensagem indicando se a execução do script foi bem-sucedida ou não
+    if result['failed'] == '0':
+        return f"O script {script_name} foi executado com sucesso no host {host_name}."
+    else:
+        return f"Ocorreu um erro ao executar o script {script_name} no host {host_name}: {result['message']}"
+def handle_message(update, context):
+    chat_id = update.message.chat_id
+    message_text = update.message.text
+
+    # Analisar a mensagem para obter o nome do host e do script
+    parts = message_text.split()
+    if len(parts) != 3:
+        context.bot.send_message(chat_id=chat_id, text="Por favor, forneça o nome do host e do script na mensagem.")
+        return
+    host_name = parts[1]
+    script_name = parts[2]
+
+    # Debug para verificar os valores de host_name e script_name
+    print(f"host_name: {host_name}, script_name: {script_name}")
+
+    # Executar o script no host especificado
+    result = execute_script_on_host(chat_id, host_name, script_name)
+
+    # Enviar a mensagem de retorno para o chat
+    context.bot.send_message(chat_id=chat_id, text=result)
+
 def get_graphs_by_host(host_name):
     # Busca o ID do host
     host = zapi.host.get(filter={'name': host_name})
@@ -199,6 +247,7 @@ def help(update, context):
                                             "/hosts  - /host \"NOME_DO_GRUPO\" ver os hosts vinculados ao grupo\n"
                                             "/graf  - /graf \"NOME_DO_HOST\" ver os graficos desse host\n"
                                             "/grafico  - /grafico \"NOME_DO_HOST\" \"NOME_DO_GRAFICO\" retorna o grafico \n"
+                                            "/script  - /script \"NOME_DO_HOST\" \"NOME_DO_SCRIPT\" executa o script \n"
 
                              )
 
@@ -253,6 +302,7 @@ def main():
     dispatcher.add_handler(CommandHandler("hosts", enviar_hosts_zabbix))
     dispatcher.add_handler(CommandHandler("graf", enviar_graficos_zabbix))
     dispatcher.add_handler(CommandHandler("grupos", grupos))
+    dispatcher.add_handler(CommandHandler("script", handle_message))
 
 
     updater.start_polling()
