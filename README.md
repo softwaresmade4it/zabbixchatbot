@@ -27,7 +27,7 @@ mv  zabbix-chat-bot.py /usr/lib/zabbix/alertscripts/
 Debian:
 ```sh 
 # apt install python3-pip python-urllib3
-# pip install -r requeriments.txt 
+# pip install -r requirements.txt
 ```
 -  Edite o script e alimente as variáveis
 
